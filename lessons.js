@@ -1,0 +1,87 @@
+let lessons = [
+    {
+        subject:'Violin',
+        location:'La Marie',
+        price:1000,
+        spaces:10,
+        image:'images/violin.png'
+    },
+    {
+        subject:'Piano',
+        location:'Port-Louis',
+        price:1200,
+        spaces:15,
+        image:'images/grand-piano.png'
+    },
+    {
+        subject:'Guitar',
+        location:'Grand Baie',
+        price:900,
+        spaces:17,
+        image:'images/guitar.png'
+    },
+    {
+        subject:'Cymbals',
+        location:'La Marie',
+        price:1500,
+        spaces:13,
+        image:'images/cymbals.png'
+    },
+    {
+        subject:'Bassoon',
+        location:'Flic-en-Flac',
+        price:2000,
+        spaces:14,
+        image:'images/bassoon.png'
+    },
+    {
+        subject:'Trumpet',
+        location:'Port-Louis',
+        price:1100,
+        spaces:11,
+        image:'images/trumpet.png'
+    },
+    {
+        subject:'French Horn',
+        location:'Phoenix',
+        price:1800,
+        spaces:12,
+        image:'images/french-horn.png'
+    },
+    {
+        subject:'Trombone',
+        location:'Tamarin',
+        price:1300,
+        spaces:16,
+        image:'images/trombone.png'
+    },
+    {
+        subject:'Harp',
+        location:'Phoenix',
+        price:2500,
+        spaces:10,
+        image:'images/harp.png'
+    },
+    {
+        subject:'Clarinet',
+        location:'Curepipe',
+        price:1400,
+        spaces:12,
+        image:'images/clarinet.png'
+    },
+    {
+        subject:'Timpani',
+        location:'Curepipe',
+        price:2200,
+        spaces:13,
+        image:'images/timpani.png'
+    },
+    {
+        subject:'Xylophone',
+        location:'Port-Louis',
+        price:1600,
+        spaces:15,
+        image:'images/xylophone.png'
+    }
+]
+module.exports = lessons;
