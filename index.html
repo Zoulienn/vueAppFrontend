@@ -10,6 +10,8 @@
 <div id="app">
     <header>
         <h1>{{message}}</h1>
+        <!-- cart indicator -->
+        <div class="cart-indicator">Cart: <span class="cart-count">{{ cart.length }}</span></div>
     </header>
 
     <main>
@@ -21,6 +23,12 @@
                 <p><strong>Location:</strong> {{ lesson.location }}</p>
                 <p><strong>Price:</strong> {{ lesson.price }}</p>
                 <p><strong>Spaces:</strong> {{ lesson.spaces }}</p>
+
+                <!-- Add to Cart button; disabled when no spaces left-->
+                <button class="btn-add" v-on:click="addToCart(lesson)" :disabled="lesson.spaces === 0">
+                  {{ lesson.spaces === 0 ? 'Out Of Seats' : 'Add To Cart' }}
+                </button>
+
             </article>
         </section>
     </main>
