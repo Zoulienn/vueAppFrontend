@@ -1,4 +1,4 @@
-let lessons = [
+const lessons = [
     {
         subject:'Violin',
         location:'La Marie',
@@ -84,4 +84,5 @@ let lessons = [
         image:'images/xylophone.png'
     }
 ]
-module.exports = lessons;
+
+export default lessons;

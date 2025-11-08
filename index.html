@@ -3,13 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <script src="https://unpkg.com/vue@2.7.8/dist/vue.js"></script>
+    <link rel="stylesheet" href="styles.css">
     <title>After School Lesson</title>
 </head>
 <body>
 <div id="app">
-    {{ message }}
+    <header>
+        <h1>{{message}}</h1>
+    </header>
+
+    <main>
+        <!-- Render all lessons using v-for and a method that returns the lessons -->
+        <section class="lessons">
+            <article v-for="(lesson, index) in displayLessons()" :key="index" class="lesson">
+                <img :src="lesson.image" :alt="lesson.subject" width="120">
+                <h2>{{ lesson.subject }}</h2>
+                <p><strong>Location:</strong> {{ lesson.location }}</p>
+                <p><strong>Price:</strong> {{ lesson.price }}</p>
+                <p><strong>Spaces:</strong> {{ lesson.spaces }}</p>
+            </article>
+        </section>
+    </main>
 </div>
 
-<script src="index.js"></script>
+<script type="module" src="index.js"></script>
 </body>
 </html>
