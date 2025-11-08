@@ -10,11 +10,39 @@
 <div id="app">
     <header>
         <h1>{{message}}</h1>
+
         <!-- cart indicator -->
-        <div class="cart-indicator">Cart: <span class="cart-count">{{ cart.length }}</span></div>
+        <div class="cart-indicator">
+          <img src="images/shopping-cart.png" alt="Cart" class="cart-icon">
+          <span class="cart-count">{{ cart.length }}</span>
+        </div>
+
     </header>
 
     <main>
+
+        <!-- Sort controls -->
+        <div class="sort-controls">
+            <label>
+                Sort by:
+                <select v-model="sort.field">
+                    <option value="subject">Subject</option>
+                    <option value="location">Location</option>
+                    <option value="price">Price</option>
+                    <option value="spaces">Spaces</option>
+                </select>
+            </label>
+
+            <label>
+                Order:
+                <select v-model="sort.direction">
+                    <option value="asc">Ascending</option>
+                    <option value="desc">Descending</option>
+                </select>
+            </label>
+        </div>
+        <br>
+
         <!-- Render all lessons using v-for and a method that returns the lessons -->
         <section class="lessons">
             <article v-for="(lesson, index) in displayLessons()" :key="index" class="lesson">

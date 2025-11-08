@@ -6,11 +6,29 @@ new Vue({
         message: 'Classical Music Lessons',
         lessons: lessons,
         cart: [],
+        sort: {
+            field: 'subject',
+            direction: 'asc'
+        }
     },
     methods: {
-        // returns the list of lessons
+        // returns the list of lessons sorted according to `sort`
         displayLessons() {
-            return this.lessons;
+            const field = this.sort.field;
+            const dir = this.sort.direction === 'asc' ? 1 : -1;
+
+            return this.lessons.slice().sort((a, b) => {
+                let va = a[field];
+                let vb = b[field];
+
+                // normalize strings
+                if (typeof va === 'string') va = va.toLowerCase();
+                if (typeof vb === 'string') vb = vb.toLowerCase();
+
+                if (va < vb) return -1 * dir;
+                if (va > vb) return 1 * dir;
+                return 0;
+            });
         },
         addToCart(lesson) {
             // guard: no spaces left
