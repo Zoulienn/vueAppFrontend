@@ -11,54 +11,92 @@
     <header>
         <h1>{{message}}</h1>
 
-        <!-- cart indicator -->
-        <div class="cart-indicator">
+        <!-- cart indicator as a button; disabled when cart is empty -->
+        <button class="cart-button" v-on:click="toggleCart" :disabled="cart.length === 0" :aria-pressed="showCart">
           <img src="images/shopping-cart.png" alt="Cart" class="cart-icon">
           <span class="cart-count">{{ cart.length }}</span>
-        </div>
+        </button>
 
     </header>
 
     <main>
 
-        <!-- Sort controls -->
-        <div class="sort-controls">
-            <label>
-                Sort by:
-                <select v-model="sort.field">
-                    <option value="subject">Subject</option>
-                    <option value="location">Location</option>
-                    <option value="price">Price</option>
-                    <option value="spaces">Spaces</option>
-                </select>
-            </label>
+        <!-- Sort controls and lessons are shown when not viewing cart -->
+        <div v-if="!showCart">
+            <!-- Sort controls -->
+            <div class="sort-controls">
+                <label>
+                    Sort by:
+                    <select v-model="sort.field">
+                        <option value="subject">Subject</option>
+                        <option value="location">Location</option>
+                        <option value="price">Price</option>
+                        <option value="spaces">Spaces</option>
+                    </select>
+                </label>
 
-            <label>
-                Order:
-                <select v-model="sort.direction">
-                    <option value="asc">Ascending</option>
-                    <option value="desc">Descending</option>
-                </select>
-            </label>
+                <label>
+                    Order:
+                    <select v-model="sort.direction">
+                        <option value="asc">Ascending</option>
+                        <option value="desc">Descending</option>
+                    </select>
+                </label>
+            </div>
+            <br>
+
+            <!-- Render all lessons using v-for and a method that returns the lessons -->
+            <section class="lessons">
+                <article v-for="(lesson, index) in displayLessons()" :key="lesson.origIndex" class="lesson">
+                    <img :src="lesson.image" :alt="lesson.subject" width="120">
+                    <h2>{{ lesson.subject }}</h2>
+                    <p><strong>Location:</strong> {{ lesson.location }}</p>
+                    <p><strong>Price:</strong> {{ lesson.price }}</p>
+                    <p><strong>Spaces:</strong> {{ lesson.spaces }}</p>
+
+                    <!-- Add to Cart button; disabled when no spaces left-->
+                    <button class="btn-add" v-on:click="addToCart(lesson, lesson.origIndex)" :disabled="lesson.spaces === 0">
+                      {{ lesson.spaces === 0 ? 'Out Of Seats' : 'Add To Cart' }}
+                    </button>
+
+                </article>
+            </section>
         </div>
-        <br>
 
-        <!-- Render all lessons using v-for and a method that returns the lessons -->
-        <section class="lessons">
-            <article v-for="(lesson, index) in displayLessons()" :key="index" class="lesson">
-                <img :src="lesson.image" :alt="lesson.subject" width="120">
-                <h2>{{ lesson.subject }}</h2>
-                <p><strong>Location:</strong> {{ lesson.location }}</p>
-                <p><strong>Price:</strong> {{ lesson.price }}</p>
-                <p><strong>Spaces:</strong> {{ lesson.spaces }}</p>
+        <!-- Cart page: shown when viewing cart -->
+        <div v-if="showCart">
+            <section class="cart-page">
+                <h2>Your Cart</h2>
+                <p v-if="cart.length === 0">Your cart is empty.</p>
 
-                <!-- Add to Cart button; disabled when no spaces left-->
-                <button class="btn-add" v-on:click="addToCart(lesson)" :disabled="lesson.spaces === 0">
-                  {{ lesson.spaces === 0 ? 'Out Of Seats' : 'Add To Cart' }}
-                </button>
+                <!-- Cart items displayed as small cards -->
+                <section class="cart-items">
+                  <article v-for="(entry, cidx) in cart" :key="entry.origIndex" class="cart-card">
+                    <img :src="entry.image" :alt="entry.subject" class="cart-card-img">
+                    <div class="cart-card-body">
+                      <h3>{{ entry.subject }}</h3>
+                      <p class="cart-location">Location: {{ lessons[entry.origIndex].location }}</p>
+                      <p class="cart-price">Price: {{ entry.price }}</p>
 
-            </article>
-        </section>
+                      <div class="qty-controls">
+                        <button class="qty-btn" v-on:click="decreaseQuantity(cidx)">-</button>
+                        <span class="qty">{{ entry.qty }}</span>
+                        <button class="qty-btn" v-on:click="increaseQuantity(cidx)">+</button>
+                      </div>
+                    </div>
+
+                    <div class="cart-card-actions">
+                      <button class="btn-remove" v-on:click="removeFromCart(cidx)">Remove</button>
+                    </div>
+                  </article>
+                </section>
+
+                <div class="cart-summary" v-if="cart.length > 0">
+                    <div>Total: <strong>{{ totalPrice }}</strong></div>
+                </div>
+            </section>
+        </div>
+
     </main>
 </div>
 

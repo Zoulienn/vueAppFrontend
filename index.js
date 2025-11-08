@@ -9,15 +9,19 @@ new Vue({
         sort: {
             field: 'subject',
             direction: 'asc'
-        }
+        },
+        showCart: false,
     },
     methods: {
-        // returns the list of lessons sorted according to `sort`
+        // returns the list of lessons sorted according to `sort` and includes original index
         displayLessons() {
             const field = this.sort.field;
             const dir = this.sort.direction === 'asc' ? 1 : -1;
 
-            return this.lessons.slice().sort((a, b) => {
+            // map lessons to include their original index so UI actions can reference back
+            const mapped = this.lessons.map((l, i) => ({ ...l, origIndex: i }));
+
+            mapped.sort((a, b) => {
                 let va = a[field];
                 let vb = b[field];
 
@@ -29,19 +33,81 @@ new Vue({
                 if (va > vb) return 1 * dir;
                 return 0;
             });
+
+            return mapped;
         },
-        addToCart(lesson) {
+        addToCart(lesson, origIndex) {
             // guard: no spaces left
-            if (lesson.spaces <= 0) return;
+            if (this.lessons[origIndex].spaces <= 0) return;
 
-            // push a shallow copy into cart (so cart holds snapshot)
-            this.cart.push({ ...lesson });
+            // see if this lesson already in cart
+            const existing = this.cart.find(e => e.origIndex === origIndex);
+            if (existing) {
+                // increment quantity if there are spaces left
+                if (this.lessons[origIndex].spaces <= 0) return;
+                existing.qty += 1;
+            } else {
+                // push a new entry with qty 1 and include image
+                this.cart.push({ subject: lesson.subject, price: lesson.price, origIndex, qty: 1, image: lesson.image });
+            }
 
-            // decrement the available spaces on the lesson
-            lesson.spaces -= 1;
+            // decrement the available spaces on the lesson (mutate original)
+            this.lessons[origIndex].spaces -= 1;
+        },
+        toggleCart() {
+            // only toggle if there is at least one item (button disabled otherwise)
+            if (this.cart.length === 0) return;
+            this.showCart = !this.showCart;
+        },
+        // decrease quantity by 1 (restore one space); if qty reaches 0 remove the entry
+        decreaseQuantity(cidx) {
+            const entry = this.cart[cidx];
+            if (!entry) return;
+            const origIndex = entry.origIndex;
+
+            // restore a space to the lesson
+            if (typeof origIndex === 'number' && this.lessons[origIndex]) {
+                this.lessons[origIndex].spaces += 1;
+            }
+
+            entry.qty -= 1;
+            if (entry.qty <= 0) {
+                this.cart.splice(cidx, 1);
+            }
+
+            if (this.cart.length === 0) this.showCart = false;
+        },
+        // increase quantity by 1 if lesson has spaces available
+        increaseQuantity(cidx) {
+            const entry = this.cart[cidx];
+            if (!entry) return;
+            const origIndex = entry.origIndex;
+
+            if (typeof origIndex !== 'number' || !this.lessons[origIndex]) return;
+            if (this.lessons[origIndex].spaces <= 0) return; // no more spaces
+
+            entry.qty += 1;
+            this.lessons[origIndex].spaces -= 1;
+        },
+        // remove entire entry and restore all spaces
+        removeFromCart(cidx) {
+            const entry = this.cart[cidx];
+            if (!entry) return;
+
+            const origIndex = entry.origIndex;
+            if (typeof origIndex === 'number' && this.lessons[origIndex]) {
+                // restore as many spaces as the qty
+                this.lessons[origIndex].spaces += entry.qty;
+            }
+
+            this.cart.splice(cidx, 1);
+
+            if (this.cart.length === 0) this.showCart = false;
         }
     },
     computed: {
-
+        totalPrice() {
+            return this.cart.reduce((sum, item) => sum + ((item.price || 0) * (item.qty || 0)), 0);
+        }
     }
 });
