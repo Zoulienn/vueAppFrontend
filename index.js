@@ -11,6 +11,13 @@ new Vue({
             direction: 'asc'
         },
         showCart: false,
+        order: {
+            name: '',
+            phone: '',
+            submitted: false,
+            confirmationMessage: '',
+            showModal: false
+        }
     },
     methods: {
         // returns the list of lessons sorted according to `sort` and includes original index
@@ -53,6 +60,10 @@ new Vue({
 
             // decrement the available spaces on the lesson (mutate original)
             this.lessons[origIndex].spaces -= 1;
+
+            // clear any previous submission message when cart changes
+            this.order.submitted = false;
+            this.order.confirmationMessage = '';
         },
         toggleCart() {
             // only toggle if there is at least one item (button disabled otherwise)
@@ -103,11 +114,57 @@ new Vue({
             this.cart.splice(cidx, 1);
 
             if (this.cart.length === 0) this.showCart = false;
+        },
+        // validate name and phone using regex
+        isNameValid() {
+            if (!this.order.name) return false;
+            // allow letters and spaces only
+            return /^[A-Za-z\s]+$/.test(this.order.name.trim());
+        },
+        isPhoneValid() {
+            if (!this.order.phone) return false;
+            // numbers only
+            return /^\d+$/.test(this.order.phone.trim());
+        },
+        checkout() {
+            // only proceed when both valid and cart not empty
+            if (!this.isNameValid() || !this.isPhoneValid() || this.cart.length === 0) return;
+
+            // simulate submission: show confirmation message and clear cart
+            this.order.submitted = true;
+            this.order.confirmationMessage = `Thank you ${this.order.name.trim()}! Your order has been submitted.`;
+
+            // clear the cart (do not restore spaces -- seats are taken)
+            this.cart = [];
+
+            // show modal popup
+            this.order.showModal = true;
+
+            // auto-close modal after 2.5s and return to lessons (homepage)
+            setTimeout(() => {
+                this.closeModal();
+            }, 2500);
+        },
+        closeModal() {
+            // hide modal and go back to lessons view
+            this.order.showModal = false;
+            this.showCart = false;
+
+            // reset checkout form
+            this.order.name = '';
+            this.order.phone = '';
+
+            // clear confirmation state after redirect
+            this.order.submitted = false;
+            this.order.confirmationMessage = '';
         }
     },
     computed: {
         totalPrice() {
             return this.cart.reduce((sum, item) => sum + ((item.price || 0) * (item.qty || 0)), 0);
+        },
+        checkoutEnabled() {
+            return this.isNameValid() && this.isPhoneValid() && this.cart.length > 0;
         }
     }
 });

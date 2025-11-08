@@ -45,6 +45,11 @@
             </div>
             <br>
 
+            <!-- Search bar -->
+            <div class="search-wrapper">
+              <input id="search" class="search-input" type="search" placeholder="Search lessons...">
+            </div>
+
             <!-- Render all lessons using v-for and a method that returns the lessons -->
             <section class="lessons">
                 <article v-for="(lesson, index) in displayLessons()" :key="lesson.origIndex" class="lesson">
@@ -94,10 +99,40 @@
                 <div class="cart-summary" v-if="cart.length > 0">
                     <div>Total: <strong>{{ totalPrice }}</strong></div>
                 </div>
+
+                <!-- Checkout form: always visible in cart page -->
+                <section class="checkout">
+                  <h3>Checkout</h3>
+                  <label>
+                    Name:
+                    <input type="text" v-model="order.name" placeholder="Full name">
+                  </label>
+                  <label>
+                    Phone:
+                    <input type="text" v-model="order.phone" placeholder="Phone number">
+                  </label>
+
+                  <div class="checkout-actions">
+                    <button class="btn-checkout" v-on:click="checkout" :disabled="!checkoutEnabled">Checkout</button>
+                  </div>
+
+                  <p class="confirmation" v-if="order.submitted">{{ order.confirmationMessage }}</p>
+                </section>
+
             </section>
         </div>
 
     </main>
+
+    <!-- Modal popup for order confirmation (moved inside #app so Vue controls v-if) -->
+    <div v-if="order.showModal" class="modal-overlay">
+      <div class="modal">
+        <h3>Order Submitted</h3>
+        <p>{{ order.confirmationMessage }}</p>
+        <button class="modal-close" v-on:click="closeModal">Close</button>
+      </div>
+    </div>
+
 </div>
 
 <script type="module" src="index.js"></script>
