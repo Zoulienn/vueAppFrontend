@@ -1,10 +1,8 @@
-import lessons from "./lessons.js";
-
 new Vue({
     el: '#app',
     data: {
         message: 'Classical Music Lessons',
-        lessons: lessons,
+        lessons: [],
         cart: [],
         sort: {
             field: 'subject',
@@ -166,5 +164,18 @@ new Vue({
         checkoutEnabled() {
             return this.isNameValid() && this.isPhoneValid() && this.cart.length > 0;
         }
-    }
+    },
+    created() {
+        // fetch lessons from backend server
+        fetch('/lessons')
+            .then(res => res.json())
+            .then(data => {
+                this.lessons = data;
+                console.log("Lessons loaded from backend:", data);
+            })
+            .catch(err => {
+                console.error("Error fetching lessons:", err);
+            });
+    },
+
 });
