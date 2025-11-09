@@ -128,21 +128,44 @@ new Vue({
             // only proceed when both valid and cart not empty
             if (!this.isNameValid() || !this.isPhoneValid() || this.cart.length === 0) return;
 
-            // simulate submission: show confirmation message and clear cart
-            this.order.submitted = true;
-            this.order.confirmationMessage = `Thank you ${this.order.name.trim()}! Your order has been submitted.`;
+            // build order payload: include name, phone, and details about lessons ordered
+            const items = this.cart.map(entry => {
+                const lesson = this.lessons[entry.origIndex];
+                // use real id if available, else use the original index as an identifier
+                const lessonId = lesson && (lesson.id !== undefined ? lesson.id : entry.origIndex);
+                return { lessonId, qty: entry.qty };
+            });
 
-            // clear the cart (do not restore spaces -- seats are taken)
-            this.cart = [];
+            const totalSpaces = items.reduce((s, it) => s + (it.qty || 0), 0);
 
-            // show modal popup
-            this.order.showModal = true;
+            const orderPayload = {
+                name: this.order.name.trim(),
+                phone: this.order.phone.trim(),
+                // minimal required fields: lessonIDs (array) and spaces (total number)
+                lessonIDs: items.map(it => it.lessonId),
+                spaces: totalSpaces,
+                // keep detailed items for backend convenience
+                items
+            };
 
-            // auto-close modal after 2.5s and return to lessons (homepage)
-            setTimeout(() => {
-                this.closeModal();
-            }, 2500);
+            // send order to backend
+            fetch('/orders', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(orderPayload)
+            })
+                .then(res => {
+                    if (!res.ok) throw new Error(`Server responded ${res.status}`);
+                    return res.json().catch(() => ({}));
+                })
+                .catch(err => {
+                    console.error('Order submission failed:', err);
+                    this.order.submitted = false;
+                    this.order.confirmationMessage = 'There was an error submitting your order. Please try again.';
+                    this.order.showModal = true;
+                });
         },
+
         closeModal() {
             // hide modal and go back to lessons view
             this.order.showModal = false;
