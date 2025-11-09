@@ -158,6 +158,45 @@ new Vue({
                     if (!res.ok) throw new Error(`Server responded ${res.status}`);
                     return res.json().catch(() => ({}));
                 })
+                .then(async responseData => {
+                    // success: mark submitted, show confirmation message, clear cart and show modal
+                    const orderId = (responseData && (responseData.orderId || responseData.id || responseData._id)) || null;
+
+                    // Send one PUT request per lesson that was in the order
+                    for (const item of items) {
+                        const lesson = this.lessons.find(l => l.id === item.lessonId);
+                        if (!lesson) continue;
+
+                        // Calculate new available spaces after purchase
+                        const newSpaces = lesson.spaces;
+
+                        try {
+                            await fetch(`/lessons/${item.lessonId}`, {
+                                method: 'PUT',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ spaces: newSpaces })
+                            });
+                        } catch (err) {
+                            console.error(`Failed to update lesson ${item.lessonId}:`, err);
+                        }
+                    }
+
+                    this.order.submitted = true;
+                    this.order.confirmationMessage = orderId
+                        ? `Thank you ${this.order.name.trim()}! Your order (ID: ${orderId}) has been submitted.`
+                        : `Thank you ${this.order.name.trim()}! Your order has been submitted.`;
+
+                    // clear the cart
+                    this.cart = [];
+
+                    // show modal popup
+                    this.order.showModal = true;
+
+                    // auto-close modal after 2.5s and return to lessons
+                    setTimeout(() => {
+                        this.closeModal();
+                    }, 2500);
+                })
                 .catch(err => {
                     console.error('Order submission failed:', err);
                     this.order.submitted = false;
