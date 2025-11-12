@@ -15,9 +15,31 @@ new Vue({
             submitted: false,
             confirmationMessage: '',
             showModal: false
-        }
+        },
+        searchQuery: ''
     },
     methods: {
+        // debounce helper
+        debounce(fn, wait) {
+            let timeout = null;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => fn.apply(this, args), wait);
+            };
+        },
+        // call backend search API with current query
+        async performSearch(q) {
+            try {
+                const url = '/search' + (q && q.trim().length > 0 ? `?q=${encodeURIComponent(q)}` : '');
+                const res = await fetch(url);
+                if (!res.ok) throw new Error(`Search failed: ${res.status}`);
+                const data = await res.json();
+                // set lessons to the returned filtered list
+                this.lessons = data;
+            } catch (err) {
+                console.error('Search error:', err);
+            }
+        },
         // returns the list of lessons sorted according to `sort` and includes original index
         displayLessons() {
             const field = this.sort.field;
@@ -238,6 +260,17 @@ new Vue({
             .catch(err => {
                 console.error("Error fetching lessons:", err);
             });
+
+        // create a debounced version of performSearch to use with watcher
+        this._debouncedSearch = this.debounce(function(q) {
+            this.performSearch(q);
+        }, 250);
     },
+    watch: {
+        // watch the searchQuery and call debounced search as user types
+        searchQuery(newVal) {
+            this._debouncedSearch(newVal);
+        }
+    }
 
 });
