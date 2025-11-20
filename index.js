@@ -30,7 +30,7 @@ new Vue({
         // call backend search API with current query
         async performSearch(q) {
             try {
-                const url = '/search' + (q && q.trim().length > 0 ? `?q=${encodeURIComponent(q)}` : '');
+                const url = 'https://vueappbackend.onrender.com/search' + (q && q.trim().length > 0 ? `?q=${encodeURIComponent(q)}` : '');
                 const res = await fetch(url);
                 if (!res.ok) throw new Error(`Search failed: ${res.status}`);
                 const data = await res.json();
@@ -171,7 +171,7 @@ new Vue({
             };
 
             // send order to backend
-            fetch('/orders', {
+            fetch('https://vueappbackend.onrender.com/orders', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(orderPayload)
@@ -193,7 +193,7 @@ new Vue({
                         const newSpaces = lesson.spaces;
 
                         try {
-                            await fetch(`/lessons/${item.lessonId}`, {
+                            await fetch(`https://vueappbackend.onrender.com/lessons/${item.lessonId}`, {
                                 method: 'PUT',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({ spaces: newSpaces })
@@ -251,7 +251,7 @@ new Vue({
     },
     created() {
         // fetch lessons from backend server
-        fetch('/lessons')
+        fetch('https://vueappbackend.onrender.com/lessons')
             .then(res => res.json())
             .then(data => {
                 this.lessons = data;
