@@ -40,6 +40,20 @@ new Vue({
                 console.error('Search error:', err);
             }
         },
+        // input handler for search input (replaces watcher-based approach)
+        onSearchInput(event) {
+            // event may be a DOM event or a raw string
+            const q = (event && event.target) ? event.target.value : (typeof event === 'string' ? event : '');
+            // keep v-model in sync (if present)
+            this.searchQuery = q;
+
+            // use debounced search if available, otherwise call directly
+            if (this._debouncedSearch && typeof this._debouncedSearch === 'function') {
+                this._debouncedSearch(q);
+            } else {
+                this.performSearch(q);
+            }
+        },
         // returns the list of lessons sorted according to `sort` and includes original index
         displayLessons() {
             const field = this.sort.field;
@@ -265,12 +279,5 @@ new Vue({
         this._debouncedSearch = this.debounce(function(q) {
             this.performSearch(q);
         }, 250);
-    },
-    watch: {
-        // watch the searchQuery and call debounced search as user types
-        searchQuery(newVal) {
-            this._debouncedSearch(newVal);
-        }
     }
-
 });
