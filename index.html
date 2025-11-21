@@ -47,8 +47,8 @@
 
             <!-- Search bar -->
             <div class="search-wrapper">
-+              <!-- Search input: v-model keeps DOM and data in sync; @input triggers debounced search handler-->
-+              <input id="search" class="search-input" type="search" placeholder="Search lessons..." v-model="searchQuery" @input="onSearchInput" aria-label="Search lessons">
+              <!-- Search input: v-model keeps DOM and data in sync; @input triggers debounced search handler-->
+             <input id="search" class="search-input" type="search" placeholder="Search lessons..." v-model="searchQuery" @input="onSearchInput" aria-label="Search lessons">
             </div>
 
             <!-- Render all lessons using v-for and a method that returns the lessons -->

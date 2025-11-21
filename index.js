@@ -19,14 +19,6 @@ new Vue({
         searchQuery: ''
     },
     methods: {
-        // debounce helper
-        debounce(fn, wait) {
-            let timeout = null;
-            return function(...args) {
-                clearTimeout(timeout);
-                timeout = setTimeout(() => fn.apply(this, args), wait);
-            };
-        },
         // call backend search API with current query
         async performSearch(q) {
             try {
@@ -40,19 +32,15 @@ new Vue({
                 console.error('Search error:', err);
             }
         },
-        // input handler for search input (replaces watcher-based approach)
+        // input handler for search input
         onSearchInput(event) {
             // event may be a DOM event or a raw string
             const q = (event && event.target) ? event.target.value : (typeof event === 'string' ? event : '');
             // keep v-model in sync (if present)
             this.searchQuery = q;
 
-            // use debounced search if available, otherwise call directly
-            if (this._debouncedSearch && typeof this._debouncedSearch === 'function') {
-                this._debouncedSearch(q);
-            } else {
-                this.performSearch(q);
-            }
+            // call search immediately on every input
+            this.performSearch(q);
         },
         // returns the list of lessons sorted according to `sort` and includes original index
         displayLessons() {
@@ -275,9 +263,5 @@ new Vue({
                 console.error("Error fetching lessons:", err);
             });
 
-        // create a debounced version of performSearch to use with watcher
-        this._debouncedSearch = this.debounce(function(q) {
-            this.performSearch(q);
-        }, 250);
     }
 });
