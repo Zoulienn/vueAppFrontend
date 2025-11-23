@@ -192,7 +192,7 @@ new Vue({
                         if (!lesson) continue;
 
                         // Calculate new available spaces after purchase
-                        const newSpaces = lesson.spaces;
+                        const newSpaces = lesson.spaces - item.qty;
 
                         try {
                             await fetch(`https://vueappbackend.onrender.com/lessons/${item.lessonId}`, {
