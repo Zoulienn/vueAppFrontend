@@ -188,14 +188,14 @@ new Vue({
 
                     // Send one PUT request per lesson that was in the order
                     for (const item of items) {
-                        const lesson = this.lessons[item.lessonId];
+                        const lesson = this.lessons.find(l => l.subject === item.subject);
                         if (!lesson) continue;
 
                         // Calculate new available spaces after purchase
                         const newSpaces = lesson.spaces - item.qty;
 
                         try {
-                            await fetch(`https://vueappbackend.onrender.com/lessons/${item.lessonId}`, {
+                            await fetch(`https://vueappbackend.onrender.com/lessons/${item.subject}`, {
                                 method: 'PUT',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({ spaces: newSpaces })
