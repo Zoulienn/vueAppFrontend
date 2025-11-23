@@ -188,7 +188,7 @@ new Vue({
 
                     // Send one PUT request per lesson that was in the order
                     for (const item of items) {
-                        const lesson = this.lessons.find(l => l.id === item.lessonId);
+                        const lesson = this.lessons[item.lessonId];
                         if (!lesson) continue;
 
                         // Calculate new available spaces after purchase
