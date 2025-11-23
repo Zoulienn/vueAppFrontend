@@ -13,7 +13,7 @@
 
         <!-- cart indicator as a button; disabled when cart is empty -->
         <button class="cart-button" v-on:click="toggleCart" :disabled="cart.length === 0" :aria-pressed="showCart">
-          <img src="images/shopping-cart.png" alt="Cart" class="cart-icon">
+          <img src="https://vueappbackend.onrender.com/images/shopping-cart.png" alt="Cart" class="cart-icon">
           <span class="cart-count">{{ cart.length }}</span>
         </button>
 
